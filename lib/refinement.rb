@@ -1,6 +1,7 @@
+require 'set'
 require 'refinement/method'
 
-class Refinement
+module Refinement
 
   class << self
     def refinements
@@ -8,28 +9,23 @@ class Refinement
     end
 
     def refine(klass, method, &block)
-      refinements << new(klass, method, block)
+      refinements << Method.new(klass, method, block)
     end
 
     def use
-      refinements.each(&:use)
+      return refinements.each(&:use) unless block_given?
+      
+      begin
+        refinements.each(&:use)
+        yield
+      ensure
+        refinements.each(&:unuse)
+      end
     end
 
     def unuse
       refinements.each(&:unuse)
     end
-  end
-
-  def initialize(klass, method_name, block)
-    @method = Method.new(klass, method_name, block)
-  end
-
-  def use
-    @method.use
-  end
-
-  def unuse
-    @method.unuse
   end
 
 end

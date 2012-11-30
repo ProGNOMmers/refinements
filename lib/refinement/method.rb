@@ -1,34 +1,34 @@
-class Refinement
+module Refinement
   class Method
+
+    attr_reader :klass, :name, :block
 
     def initialize(klass, name, block)
       @klass, @name, @block = klass, name, block
     end
 
     def use
-      case visibility = visibility(name)
-      when nil
-        @klass.send :define_method, name, &@block
-      else
+      if visibility = visibility(name)
         @klass.send :alias_method, unrefined_name, name
         @klass.send :define_method, name, &@block
         @klass.send visibility, name
+      else
+        @klass.send :define_method, name, &@block
       end
     end
 
     def unuse
-      @klass.send :undef_method, name
       if unrefined_visibility = visibility(unrefined_name)
         @klass.send :alias_method, name, unrefined_name
         @klass.send :undef_method, unrefined_name
       end
     end
 
-    private
-    def name
-      @name
-    end
+    # def in_use?
+    #   !visibility(unrefined_name).nil?
+    # end
 
+    private
     def unrefined_name
       :"unrefined_#{name}"
     end
