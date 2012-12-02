@@ -22,7 +22,7 @@ module Refinement
         @klass.send :alias_method, name, unrefined_name
         @klass.send :undef_method, unrefined_name
       else
-        @klass.send :undef_method, name if exists?(name)
+        @klass.send :remove_method, name if exists?(name)
       end
     end
 
