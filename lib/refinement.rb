@@ -8,7 +8,7 @@ module Refinement
     end
 
     def refine(klass, method, &block)
-      refinements << Method.new(klass, method, block)
+      refinements << Method.new(klass, method, &block)
     end
 
     def use

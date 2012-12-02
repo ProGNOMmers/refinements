@@ -2,28 +2,32 @@ require 'spec_helper'
 
 describe Refinement do
   
-  let(:klass)               { Class.new }
-  let(:klass_instance)      { klass.new }
-  let(:method)              { :my_method }
-  let(:block)               { proc{} }
-  let(:args)                { [ klass, method, block ] }
-  let(:refinement)          { described_class.refine(*args[0..-2], &args[2]) }
+  let(:klass)          { Class.new }
+  let(:method)         { :my_method }
+  let(:block)          { -> {} }
+  let(:refinement)     { described_class.refine(klass, method, &block) }
+  let(:klass_instance) { klass.new }
 
-  before do 
+  before do
+    described_class.refinements.should be_empty
     expect{ klass.new.send(method) }.to raise_error NoMethodError
   end
 
   describe '.refine' do
     subject { refinement }
 
-    it "adds a new #{described_class}::Method to .refinements" do
+    it "adds a new instance of #{described_class}::Method to .refinements" do
       described_class.refinements.should_receive(:<<).with(kind_of(described_class::Method))
       subject
     end
 
-    it "instances a new a #{described_class}::Method" do
-      described_class::Method.should_receive(:new).with(*args)
+    it "instances a new #{described_class}::Method" do
+      described_class::Method.should_receive(:new).with(klass, method, &block)
       subject
+
+      # should_receive pushes into .refinements a nil value
+      # see https://github.com/rspec/rspec-expectations/issues/190
+      described_class.refinements.compact!
     end
 
   end
@@ -97,8 +101,7 @@ describe Refinement do
 
   end
 
-  after do 
-    described_class.refinements.compact!
+  after do
     described_class.unuse
     described_class.refinements.clear
   end

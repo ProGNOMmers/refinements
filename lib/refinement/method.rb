@@ -3,7 +3,7 @@ module Refinement
 
     attr_reader :klass, :name, :block
 
-    def initialize(klass, name, block)
+    def initialize(klass, name, &block)
       @klass, @name, @block = klass, name, block
     end
 
