@@ -20,7 +20,7 @@ module Refinement
     def unuse
       if exists?(unrefined_name)
         @klass.send :alias_method, name, unrefined_name
-        @klass.send :undef_method, unrefined_name
+        @klass.send :remove_method, unrefined_name
       else
         @klass.send :remove_method, name if exists?(name)
       end
