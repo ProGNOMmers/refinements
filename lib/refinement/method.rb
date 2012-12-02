@@ -18,9 +18,11 @@ module Refinement
     end
 
     def unuse
-      if unrefined_visibility = visibility(unrefined_name)
+      if exists?(unrefined_name)
         @klass.send :alias_method, name, unrefined_name
         @klass.send :undef_method, unrefined_name
+      else
+        @klass.send :undef_method, name if exists?(name)
       end
     end
 
@@ -31,6 +33,10 @@ module Refinement
     private
     def unrefined_name
       :"unrefined_#{name}"
+    end
+
+    def exists?(name)
+      @klass.method_defined?(name) || @klass.private_method_defined?(name)
     end
 
     def visibility(name)
