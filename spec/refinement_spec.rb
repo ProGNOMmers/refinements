@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe Refinement do
   
-  let(:klass)          { Class.new }
-  let(:method)         { :my_method }
-  let(:visibility)     { :public }
-  let(:block)          { -> { 'refined' } }
-  let(:refinement)     { described_class.refine(klass, method, visibility, &block) }
+  let(:klass)      { Class.new }
+  let(:method)     { :my_method }
+  let(:visibility) { :public }
+  let(:block)      { -> { 'refined' } }
+  let(:refinement) { described_class.refine(klass, method, visibility, &block) }
 
   before do
     described_class.refinements.should be_empty
@@ -14,6 +14,7 @@ describe Refinement do
   end
 
   describe '.refine' do
+  
     subject { refinement }
 
     it "adds a new instance of #{described_class}::Method to .refinements" do
@@ -34,6 +35,7 @@ describe Refinement do
   end
 
   describe '.use' do
+  
     subject { described_class.use }
 
     before do 
@@ -44,12 +46,15 @@ describe Refinement do
     it 'applies the refinements' do
       klass.new.send(method).should == block.call
     end
+  
     it 'does not define the method for the klass' do
       expect{ klass.send(method) }.to raise_error NoMethodError
     end
+  
   end
 
   describe '.using' do
+  
     subject { described_class.using{ klass.new.send(method) } }
     
     before { refinement }
@@ -89,7 +94,9 @@ describe Refinement do
         end
         expect{ klass.new.send(method) }.to raise_error NoMethodError
       end
+
     end
+
   end
 
   describe 'benchmarks' do
@@ -105,7 +112,6 @@ describe Refinement do
         x.report('using {}')        { described_class.using {} }
         x.report('10_000 using {}') { 10_000.times { described_class.using {} } }
       end
-
     end
 
   end
