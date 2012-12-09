@@ -1,10 +1,10 @@
 module Refinement
   class Method
 
-    attr_reader :klass, :name, :block
+    attr_reader :klass, :name, :visibility, :block
 
-    def initialize(klass, name, &block)
-      @klass, @name, @block = klass, name, block
+    def initialize(klass, name, visibility = :public, &block)
+      @klass, @name, @visibility, @block = klass, name, visibility, block
     end
 
     def use
@@ -14,6 +14,7 @@ module Refinement
         @klass.send visibility, name
       else
         @klass.send :define_method, name, &@block
+        @klass.send @visibility, name
       end
     end
 
@@ -26,15 +27,11 @@ module Refinement
       end
     end
 
-    # def in_use?
-    #   !visibility(unrefined_name).nil?
-    # end
-
-    private
     def unrefined_name
-      :"unrefined_#{name}"
+      :"unrefined_#{name}_#{object_id}"
     end
 
+    private
     def exists?(name)
       @klass.method_defined?(name) || @klass.private_method_defined?(name)
     end

@@ -7,23 +7,25 @@ module Refinement
       @refinements ||= []
     end
 
-    def refine(klass, method, &block)
-      refinements << Method.new(klass, method, &block)
+    def refine(klass, method, visibility = :public, &block)
+      refinements << Method.new(klass, method, visibility, &block)
     end
 
     def use
-      return refinements.each(&:use) unless block_given?
-      
+      refinements.each(&:use)
+    end
+
+    def unuse
+      refinements.each(&:unuse)
+    end
+
+    def using
       begin
         refinements.each(&:use)
         yield
       ensure
         refinements.each(&:unuse)
       end
-    end
-
-    def unuse
-      refinements.each(&:unuse)
     end
   end
 
