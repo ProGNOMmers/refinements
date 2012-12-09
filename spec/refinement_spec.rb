@@ -4,7 +4,7 @@ describe Refinement do
   
   let(:klass)      { Class.new }
   let(:method)     { :my_method }
-  let(:visibility) { :public }
+  let(:visibility) { nil }
   let(:block)      { -> { 'refined' } }
   let(:refinement) { described_class.refine(klass, method, visibility, &block) }
 

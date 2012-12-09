@@ -1,13 +1,13 @@
 require 'refinement/method'
 
-module Refinement
+class Refinement
 
   class << self
     def refinements
       @refinements ||= []
     end
 
-    def refine(klass, method, visibility = :public, &block)
+    def refine(klass, method, visibility = nil, &block)
       refinements << Method.new(klass, method, visibility, &block)
     end
 

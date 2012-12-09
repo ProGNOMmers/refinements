@@ -1,10 +1,11 @@
-module Refinement
+class Refinement
   class Method
 
     attr_reader :klass, :name, :visibility, :block
 
-    def initialize(klass, name, visibility = :public, &block)
-      @klass, @name, @visibility, @block = klass, name, visibility, block
+    def initialize(klass, name, visibility = nil, &block)
+      @klass, @name, @block = klass, name, block
+      @visibility ||= :public
     end
 
     def use
