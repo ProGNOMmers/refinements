@@ -28,11 +28,11 @@ class Refinement
       end
     end
 
+    private
     def unrefined_name
       :"unrefined_#{name}_#{object_id}"
     end
 
-    private
     def exists?(name)
       @klass.method_defined?(name) || @klass.private_method_defined?(name)
     end

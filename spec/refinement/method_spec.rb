@@ -20,7 +20,9 @@ class Refinement
       end
       
       context 'when the method is already defined' do
-        before { klass.send :define_method, method, &proc{ 'unrefined' } }
+
+        before { klass.send :define_method, method, &unrefined_block }
+
         it 'defines it' do
           subject
           klass.new.send(method).should == refined_block.call
@@ -32,7 +34,6 @@ class Refinement
     describe '#unuse' do
 
       let(:instance) { described_class.new(klass, method, &refined_block) }
-
       
       subject { instance.unuse }
       
@@ -57,6 +58,54 @@ class Refinement
           subject
           klass.new.send(method).should == unrefined_block.call
         end
+      end
+
+    end
+
+    context 'benchmarks' do
+
+      let(:instance) { described_class.new(klass, method, &proc{}) }
+
+      describe '#use' do
+
+        context 'a refined method which was undefined' do
+          example ' ' do
+            if klass.method_defined?(method)
+              raise "#{klass}.new.#{method} should not be defined"
+            end
+
+            example_group = example.metadata[:example_group]
+            context       = example_group[:description_args].first
+            describe      = example_group[:example_group][:description_args].first
+            
+            Benchmark.bmbm do |x|
+              x.report("#{describe} #{context}")             { instance.use }
+              x.report("#{describe} #{context} 1_000 times") { 1_000.times { instance.use } }
+            end
+          end
+        end
+
+        context 'a refined method which was defined' do
+
+          before { klass.send :define_method, method, &unrefined_block }
+
+          example ' ' do
+            unless klass.method_defined?(method)
+              raise "#{klass}.new.#{method} should be defined"
+            end
+            
+            example_group = example.metadata[:example_group]
+            context       = example_group[:description_args].first
+            describe      = example_group[:example_group][:description_args].first
+
+            Benchmark.bmbm do |x|
+              x.report("#{describe} #{context}")             { instance.use }
+              x.report("#{describe} #{context} 1_000 times") { 1_000.times { instance.use } }
+            end
+          end
+
+        end
+
       end
 
     end

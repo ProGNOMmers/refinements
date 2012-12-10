@@ -110,7 +110,7 @@ describe Refinement do
 
       Benchmark.bmbm do |x|
         x.report('using {}')        { described_class.using {} }
-        x.report('10_000 using {}') { 10_000.times { described_class.using {} } }
+        x.report('1_000 using {}') { 1_000.times { described_class.using {} } }
       end
     end
 
