@@ -20,12 +20,10 @@ class Refinement
     end
 
     def using
-      begin
-        refinements.each(&:use)
-        yield
-      ensure
-        refinements.each(&:unuse)
-      end
+      refinements.each(&:use)
+      yield
+    ensure
+      refinements.each(&:unuse)
     end
   end
 
