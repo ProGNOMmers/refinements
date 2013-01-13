@@ -30,7 +30,7 @@ class Refinement
 
     private
     def unrefined_name
-      :"unrefined_#{name}_#{object_id}"
+      :"__unrefined_#{name}_#{object_id}"
     end
 
     def exists?(name)
