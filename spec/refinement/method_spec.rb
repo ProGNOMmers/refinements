@@ -7,24 +7,33 @@ class Refinement
     let(:method)          { :my_method }
     let(:unrefined_block) { -> { 'unrefined' } }
     let(:refined_block)   { -> { 'refined' } }
+    let(:instance)        { described_class.new(klass, method, &refined_block) }
 
     describe '#use' do
       
-      subject { described_class.new(klass, method, &refined_block).use }
+      subject { instance.use }
       
       context 'when the method is not already defined' do
+
+        before { subject }
+
         it 'defines it' do
-          subject
           klass.new.send(method).should == refined_block.call
         end
       end
       
       context 'when the method is already defined' do
 
-        before { klass.send :define_method, method, &unrefined_block }
-
-        it 'defines it' do
+        before do
+          klass.send :define_method, method, &unrefined_block
           subject
+        end
+
+        it 'renames the old method' do
+          klass.new.should respond_to :"__unrefined_#{method}_#{instance.object_id}"
+        end
+
+        it 'defines the new method' do
           klass.new.send(method).should == refined_block.call
         end
       end
@@ -33,13 +42,11 @@ class Refinement
 
     describe '#unuse' do
 
-      let(:instance) { described_class.new(klass, method, &refined_block) }
-      
       subject { instance.unuse }
       
       context 'when the method is not already defined' do
         
-        before{ instance.use }
+        before { instance.use }
         
         it 'restores the previous behaviour' do
           subject

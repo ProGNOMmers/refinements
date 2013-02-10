@@ -102,14 +102,14 @@ describe Refinement do
   describe 'benchmarks' do
 
     example 'using {} a refined method which was undefined' do
-      if klass.method_defined?(method) or klass.private_method_defined?(method)
+      if klass.method_defined?(method) || klass.private_method_defined?(method)
         raise "#{klass}.new.#{method} should not be defined"
       end
       
       described_class.refine(klass, method){}
 
       Benchmark.bmbm do |x|
-        x.report('using {}')        { described_class.using {} }
+        x.report('using {}')       { described_class.using {} }
         x.report('1_000 using {}') { 1_000.times { described_class.using {} } }
       end
     end
